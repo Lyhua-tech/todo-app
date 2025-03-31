@@ -1,0 +1,82 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using TodoController.Dtos;
+using TodoController.Repositories;
+using TodoController.Services;
+
+namespace TodoController.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TodoItemController : ControllerBase
+    {
+        private readonly ITodoItemService _todoService;
+
+        public TodoItemController(ITodoItemService todoService){
+            _todoService = todoService;
+        } 
+
+        [HttpGet]
+        public async Task<ActionResult> GetAll(){
+            var todoItems = await _todoService.GetAllTodoItemsAsync();
+            
+
+            return Ok(todoItems);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetOne(long id){
+            try{
+                var todoItem = await _todoService.GetOneTodoItemAsync(id);
+                return Ok(todoItem);
+            } catch (KeyNotFoundException){     
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateTodo([FromBody] TodoRequestDto todoRequestDto){
+            if (!ModelState.IsValid){
+                return BadRequest(ModelState);
+            }
+
+            await _todoService.CreateTodo(todoRequestDto);
+
+            return CreatedAtAction(nameof(GetOne), new {id = todoRequestDto.Id}, todoRequestDto);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateTodo(long id, TodoRequestDto todoRequestDto){
+            try{
+                await _todoService.UpdateTodo(id, todoRequestDto);
+                
+                return NoContent();
+
+            } catch(KeyNotFoundException){
+                
+                return NotFound();
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteTodo(long id){
+            try{
+                await _todoService.RemoveTodo(id);
+
+                return NoContent();
+            } catch(KeyNotFoundException){
+                return NotFound();
+            }
+        }
+
+        [HttpGet("complete/{period}")]
+        public async Task<ActionResult> GetCompletedTask(long period){
+            var taskComplete =  await _todoService.GetAllTaskDaysAsync(period);
+
+            return Ok(taskComplete);
+        }
+    }
+}

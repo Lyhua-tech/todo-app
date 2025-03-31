@@ -1,0 +1,38 @@
+# Build outputs
+**/bin/
+**/obj/
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+
+# NuGet packages
+packages/
+*.nupkg
+.nuget/
+
+# Local development files
+**/appsettings.Development.json
+**/secrets.json
+
+# IDE-specific
+.vscode/
+.idea/
+**/Properties/launchSettings.json
+
+# Dependency directories
+node_modules/
+
+# Test results
+TestResults/
+coverage/
+
+# Temp files
+*.log
+*.bak
+*.tmp
