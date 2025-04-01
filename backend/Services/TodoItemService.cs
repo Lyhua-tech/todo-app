@@ -16,8 +16,8 @@ namespace backend.Services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync() {
-            var todoItems = await _repo.GetTodoItems();
+        public async Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync(string method = "", string field = "", string order = "") {
+            var todoItems = await _repo.GetTodoItems(method, field, order);
             return todoItems.Select(p => new TodoResponseDto{
                 Id = p.Id,
                 Title = p.Title,

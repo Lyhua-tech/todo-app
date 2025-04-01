@@ -8,7 +8,7 @@ namespace backend.Services
 {
     public interface ITodoItemService
     {
-        public Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync();
+        public Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync(string method, string field, string order);
         public Task<TodoResponseDto> GetOneTodoItemAsync(long id);
 
         public Task<TodoResponseDto> CreateTodo(TodoRequestDto todoRequestDto);

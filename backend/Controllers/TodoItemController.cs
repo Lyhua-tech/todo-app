@@ -20,9 +20,11 @@ namespace backend.Controllers
         } 
 
         [HttpGet]
-        public async Task<ActionResult> GetAll(){
-            var todoItems = await _todoService.GetAllTodoItemsAsync();
-            
+        public async Task<ActionResult> GetAll([FromQuery(Name = "sortBy")] string? field = null, [FromQuery(Name = "order")] string? order = "ASC")
+        {
+            var method = string.IsNullOrEmpty(field) ? "" : "sortBy";
+
+            var todoItems = await _todoService.GetAllTodoItemsAsync(method, field ?? "Id", order ?? "ASC");
 
             return Ok(todoItems);
         }

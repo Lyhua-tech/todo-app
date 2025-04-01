@@ -8,7 +8,7 @@ namespace backend.Repositories
 {
     public interface ITodoItemRepository
     {
-        Task<IEnumerable<TodoItem>> GetTodoItems();
+        Task<IEnumerable<TodoItem>> GetTodoItems(string method, string field, string order);
         Task<TodoItem?> GetTodo(long id);
         Task CreateTodo(TodoItem todoItem);
         Task UpdateTodo(TodoItem todoItem);

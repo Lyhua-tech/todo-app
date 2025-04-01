@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Database;
 using Dapper;
 using backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Repositories
 {
@@ -17,9 +18,23 @@ namespace backend.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<TodoItem>> GetTodoItems()
+        public async Task<IEnumerable<TodoItem>> GetTodoItems(string method = "", string field = "", string order = "")
         {
             using var connection = _dbContext.CreateConnection();
+            if ( method == "sortBy"){
+                field = string.IsNullOrEmpty(field) ? "Id" : field;
+
+                var allowedFields = new[] { "Id", "Title", "IsCompleted", "CreatedAt", "UpdatedAt", "CompleteAt" };
+                if (!allowedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
+                {
+                    field = "Id";
+                }
+                order = (order?.ToUpper() == "DESC") ? "DESC" : "ASC";
+
+                string sqlSort = $"SELECT * FROM TodoItems ORDER BY {field} {order}";
+                
+                return await connection.QueryAsync<TodoItem>(sqlSort);
+            }
             string sql = "SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt FROM TodoItems";
             
             var tasks = await connection.QueryAsync<TodoItem>(sql);
