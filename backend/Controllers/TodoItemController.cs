@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TodoController.Dtos;
-using TodoController.Repositories;
-using TodoController.Services;
+using backend.Dtos;
+using backend.Repositories;
+using backend.Services;
 
-namespace TodoController.Controllers
+namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

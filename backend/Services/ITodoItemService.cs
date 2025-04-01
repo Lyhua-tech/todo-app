@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TodoController.Dtos;
+using backend.Dtos;
 
-namespace TodoController.Services
+namespace backend.Services
 {
     public interface ITodoItemService
     {

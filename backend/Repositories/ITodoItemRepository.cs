@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TodoController.Models;
+using backend.Models;
 
-namespace TodoController.Repositories
+namespace backend.Repositories
 {
     public interface ITodoItemRepository
     {

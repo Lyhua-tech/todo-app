@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TodoController.Dtos;
-using TodoController.Models;
-using TodoController.Repositories;
+using backend.Dtos;
+using backend.Models;
+using backend.Repositories;
 
-namespace TodoController.Services
+namespace backend.Services
 {
     public class TodoItemService : ITodoItemService
     {
@@ -22,7 +22,10 @@ namespace TodoController.Services
                 Id = p.Id,
                 Title = p.Title,
                 IsCompleted = p.IsCompleted,
-                CompleteAt = p.CompleteAt
+                Content = p.Content,
+                CompleteAt = p.CompleteAt,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.CreatedAt
             });
         }
 
@@ -31,20 +34,25 @@ namespace TodoController.Services
 
             if (todoItem == null) {
                 throw new KeyNotFoundException("Task is not found.");
-            } 
+            }
+
 
             return new TodoResponseDto{
                 Id = todoItem.Id,
                 Title = todoItem.Title,
                 IsCompleted = todoItem.IsCompleted,
-                CompleteAt = todoItem.CompleteAt
+                Content = todoItem.Content,
+                CompleteAt = todoItem.CompleteAt,
+                CreatedAt = todoItem.CreatedAt,
+                UpdatedAt = todoItem.CreatedAt
             };
         }
 
         public async Task<TodoResponseDto> CreateTodo(TodoRequestDto todoRequestDto){
             var newTodo = new TodoItem{
                 Title = todoRequestDto.Title,
-                IsCompleted = todoRequestDto.IsCompleted
+                IsCompleted = todoRequestDto.IsCompleted,
+                Content = todoRequestDto.Content
             };
 
             await _repo.CreateTodo(newTodo);
@@ -53,6 +61,7 @@ namespace TodoController.Services
                 Id = newTodo.Id,
                 Title = newTodo.Title,
                 IsCompleted = newTodo.IsCompleted,
+                Content = newTodo.Content
             };
         }
 
@@ -96,7 +105,10 @@ namespace TodoController.Services
                 Id = p.Id,
                 Title = p.Title,
                 IsCompleted = p.IsCompleted,
-                CompleteAt = p.CompleteAt
+                Content = p.Content,
+                CompleteAt = p.CompleteAt,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.CreatedAt
             });
         }
     }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
-using TodoController.Dtos;
+using backend.Dtos;
 
-namespace TodoController.Dtos
+namespace backend.Dtos
 {
     public class TodoDto
     {

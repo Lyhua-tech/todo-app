@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 
-namespace TodoController.Dtos
+namespace backend.Dtos
 {
     public class TodoRequestDto
     {
         public long Id { get; set; }
         public string? Title { get; set; }
+        public string? Content { get; set; }
         public bool IsCompleted { get; set; }
 
         public DateTime? CompleteAt { get; set; }

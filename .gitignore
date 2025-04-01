@@ -18,6 +18,7 @@ packages/
 
 # Local development files
 **/appsettings.Development.json
+**/appsettings.json
 **/secrets.json
 
 # IDE-specific
