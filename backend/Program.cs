@@ -37,21 +37,18 @@ builder.Services.AddScoped<SqlConnectionFactory>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVueApp", 
-        builder => builder
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+    options.AddPolicy("AllowLocalhost",
+        policy => policy
+             .WithOrigins("http://localhost:5173", "https://lyhua-tech.github.io") 
+            .AllowAnyMethod()                     
+            .AllowAnyHeader()                      
+            .AllowCredentials());                 
 });
-
-
 builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ITodoItemService, TodoItemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
 
 var app = builder.Build();
 
@@ -81,17 +78,14 @@ if (app.Environment.IsDevelopment())
 {
     
 }
-app.MapOpenApi();
-
 app.UseHttpsRedirection();
-
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseCors("AllowLocalhost");  
 
-app.UseCors("AllowAll");
-app.UseCors("AllowVueApp");    
+app.MapControllers();
+app.MapOpenApi();
 
 app.Run();
