@@ -10,25 +10,28 @@
           type="checkbox"
           v-model="todo.isCompleted"
           @change="updateTodo(todo)"
-          class="size-4 accent-emerald-600"
+          class="size-4 accent-pink-600"
         />
-        <span
-          v-if="!todo.isEditing"
-          :class="{
-            'text-emerald-600': todo.isCompleted,
-            'text-amber-500': !todo.isCompleted,
-          }"
-        >
-          {{ index + 1 }}. {{ todo.title }}
-        </span>
+        <router-link :to="`/dashboard/${todo.id}`">
+          <span
+            v-if="!todo.isEditing"
+            :class="{
+              'text-pink-600': todo.isCompleted,
+              'text-amber-500': !todo.isCompleted,
+            }"
+          >
+            {{ index + 1 }}. {{ todo.title }}
+          </span>
+          <span v-else></span>
+        </router-link>
         <input
           type="text"
-          v-else
+          v-if="todo.isEditing"
           v-model="todo.title"
           @change="editTitle(todo)"
           class="px-1 focus:outline-hidden rounded h-[45px] ml-2.5 field-sizing-fixed w-[400px]"
           :class="{
-            'text-emerald-600': todo.isCompleted,
+            'text-pink-600': todo.isCompleted,
             'text-amber-500': !todo.isCompleted,
             'break-words': todo.title.length > 50,
             truncate: todo.title.length <= 50,
@@ -38,7 +41,7 @@
       <div>
         <button
           @click="deleteTodo(todo.id)"
-          class="group py-1 px-2 bg-zinc-100 hover:bg-emerald-600 rounded transition"
+          class="group py-1 px-2 bg-zinc-100 hover:bg-pink-600 rounded transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +49,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-6 text-emerald-600 group-hover:text-zinc-100 transition"
+            class="size-6 text-pink-600 group-hover:text-zinc-100 transition"
           >
             <path
               stroke-linecap="round"
@@ -58,7 +61,7 @@
         <button
           v-if="!todo.isEditing"
           @click="toggleEdit(todo)"
-          class="group py-1 px-2 bg-zinc-100 hover:bg-emerald-600 rounded transition"
+          class="group py-1 px-2 bg-zinc-100 hover:bg-pink-600 rounded transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +69,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-6 text-emerald-600 group-hover:text-zinc-100 transition"
+            class="size-6 text-pink-600 group-hover:text-zinc-100 transition"
           >
             <path
               stroke-linecap="round"
@@ -78,7 +81,7 @@
         <button
           v-if="todo.isEditing"
           @click="toggleEdit(todo)"
-          class="group py-1 px-2 bg-zinc-100 hover:bg-emerald-600 rounded transition"
+          class="group py-1 px-2 bg-zinc-100 hover:bg-pink-600 rounded transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +89,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-6 text-emerald-600 group-hover:text-zinc-100 transition"
+            class="size-6 text-pink-600 group-hover:text-zinc-100 transition"
           >
             <path
               stroke-linecap="round"

@@ -53,7 +53,6 @@ export default {
 
       if (time == 0) {
         const hours = this.formatHour(dateString);
-        console.log(hours);
         if (hours == 0) {
           return "now";
         } else if (hours == 1) {

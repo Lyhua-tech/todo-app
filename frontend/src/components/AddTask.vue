@@ -10,7 +10,7 @@
     />
     <button
       type="submit"
-      class="border border-transparent hover:border-1 py-0.5 px-2 m-1 rounded hover:bg-emerald-600 hover:text-white transition ease-in-out"
+      class="border border-transparent hover:border-1 py-0.5 px-2 m-1 rounded hover:bg-pink-600 hover:text-white transition ease-in-out"
     >
       add
     </button>
