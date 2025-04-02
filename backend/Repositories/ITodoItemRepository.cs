@@ -8,12 +8,12 @@ namespace backend.Repositories
 {
     public interface ITodoItemRepository
     {
-        Task<IEnumerable<TodoItem>> GetTodoItems(string method, string field, string order);
-        Task<TodoItem?> GetTodo(long id);
+        Task<IEnumerable<TodoItem>> GetTodoItems(int userId, string method, string field, string order);
+        Task<TodoItem?> GetTodo(long id, int userId);
         Task CreateTodo(TodoItem todoItem);
-        Task UpdateTodo(TodoItem todoItem);
-        Task RemoveTodo(long id);
+        Task UpdateTodo(TodoItem todoItem, int userId);
+        Task RemoveTodo(long id, int userId);
 
-        Task<IEnumerable<TodoItem>> GetTaskCompleteDays(long period);
+        Task<IEnumerable<TodoItem>> GetTaskCompleteDays(long period, int userId);
     }
 }

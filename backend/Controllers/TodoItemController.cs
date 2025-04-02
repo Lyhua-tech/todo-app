@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using backend.Dtos;
 using backend.Repositories;
 using backend.Services;
+using System.Security.Claims;
 
 namespace backend.Controllers
 {
@@ -19,12 +20,23 @@ namespace backend.Controllers
             _todoService = todoService;
         } 
 
+        private int GetUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+            return int.Parse(userIdClaim.Value);
+        }
+
         [HttpGet]
         public async Task<ActionResult> GetAll([FromQuery(Name = "sortBy")] string? field = null, [FromQuery(Name = "order")] string? order = "ASC")
         {
             var method = string.IsNullOrEmpty(field) ? "" : "sortBy";
+            int userId = GetUserId();
 
-            var todoItems = await _todoService.GetAllTodoItemsAsync(method, field ?? "Id", order ?? "ASC");
+            var todoItems = await _todoService.GetAllTodoItemsAsync(userId, method, field ?? "Id", order ?? "ASC");
 
             return Ok(todoItems);
         }
@@ -32,7 +44,8 @@ namespace backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetOne(long id){
             try{
-                var todoItem = await _todoService.GetOneTodoItemAsync(id);
+                int userId = GetUserId();
+                var todoItem = await _todoService.GetOneTodoItemAsync(id, userId);
                 return Ok(todoItem);
             } catch (KeyNotFoundException){     
                 return NotFound();
@@ -44,8 +57,8 @@ namespace backend.Controllers
             if (!ModelState.IsValid){
                 return BadRequest(ModelState);
             }
-
-            await _todoService.CreateTodo(todoRequestDto);
+            int userId = GetUserId();
+            await _todoService.CreateTodo(todoRequestDto, userId);
 
             return CreatedAtAction(nameof(GetOne), new {id = todoRequestDto.Id}, todoRequestDto);
         }
@@ -53,7 +66,8 @@ namespace backend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateTodo(long id, TodoRequestDto todoRequestDto){
             try{
-                await _todoService.UpdateTodo(id, todoRequestDto);
+                int userId = GetUserId();
+                await _todoService.UpdateTodo(id, todoRequestDto, userId);
                 
                 return NoContent();
 
@@ -66,7 +80,8 @@ namespace backend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTodo(long id){
             try{
-                await _todoService.RemoveTodo(id);
+                int userId = GetUserId();
+                await _todoService.RemoveTodo(id, userId);
 
                 return NoContent();
             } catch(KeyNotFoundException){
@@ -76,7 +91,8 @@ namespace backend.Controllers
 
         [HttpGet("complete/{period}")]
         public async Task<ActionResult> GetCompletedTask(long period){
-            var taskComplete =  await _todoService.GetAllTaskDaysAsync(period);
+            int userId = GetUserId();
+            var taskComplete =  await _todoService.GetAllTaskDaysAsync(period, userId);
 
             return Ok(taskComplete);
         }

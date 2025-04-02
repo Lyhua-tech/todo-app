@@ -4,6 +4,9 @@ using backend.Dtos;
 using backend.Repositories;
 using backend.Services;
 using Dapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,19 +18,40 @@ builder.Services.AddControllers()
     })
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<TodoValidator>());
 
-builder.Services.AddOpenApi();
-builder.Services.AddScoped<SqlConnectionFactory>();  // Changed from Singleton to Scoped
-
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", builder => {
-        builder.AllowAnyHeader();
-        builder.AllowAnyMethod();
-        builder.AllowAnyOrigin();
+// Configure JWT authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection("AppSettings:Token").Value!)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
     });
+
+builder.Services.AddOpenApi();
+builder.Services.AddScoped<SqlConnectionFactory>(); 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueApp", 
+        builder => builder
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
 
-builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>(); 
+
+builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddScoped<ITodoItemService, TodoItemService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 var app = builder.Build();
 
@@ -60,8 +84,14 @@ if (app.Environment.IsDevelopment())
 app.MapOpenApi();
 
 app.UseHttpsRedirection();
+
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.UseCors("AllowAll");
+app.UseCors("AllowVueApp");    
 
 app.Run();

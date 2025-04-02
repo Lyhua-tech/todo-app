@@ -18,7 +18,7 @@ namespace backend.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<TodoItem>> GetTodoItems(string method = "", string field = "", string order = "")
+        public async Task<IEnumerable<TodoItem>> GetTodoItems(int userId, string method = "", string field = "", string order = "")
         {
             using var connection = _dbContext.CreateConnection();
             if ( method == "sortBy"){
@@ -31,22 +31,22 @@ namespace backend.Repositories
                 }
                 order = (order?.ToUpper() == "DESC") ? "DESC" : "ASC";
 
-                string sqlSort = $"SELECT * FROM TodoItems ORDER BY {field} {order}";
+                string sqlSort = $"SELECT * FROM TodoItems ORDER BY {field} {order} WHERE UserId = {userId}";
                 
                 return await connection.QueryAsync<TodoItem>(sqlSort);
             }
-            string sql = "SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt FROM TodoItems";
+            string sql = $"SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt FROM TodoItems WHERE UserId = {userId}";
             
             var tasks = await connection.QueryAsync<TodoItem>(sql);
             
             return tasks;
         }
 
-        public async Task<TodoItem?> GetTodo(long id)
+        public async Task<TodoItem?> GetTodo(long id, int userId)
         {
             using var connection = _dbContext.CreateConnection();
-            string sql = "SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt FROM TodoItems WHERE Id = @Id";
-            return await connection.QueryFirstOrDefaultAsync<TodoItem>(sql, new { Id = id });
+            string sql = "SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt FROM TodoItems WHERE Id = @Id AND UserId = @UserId";
+            return await connection.QueryFirstOrDefaultAsync<TodoItem>(sql, new { Id = id , UserId = userId});
         }
 
         public async Task CreateTodo(TodoItem todoItem)
@@ -56,18 +56,18 @@ namespace backend.Repositories
             
             using var connection = _dbContext.CreateConnection();
             string sql = @"
-                INSERT INTO TodoItems (Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt) 
-                VALUES (@Title, @IsCompleted, @Content, @CompleteAt, @CreatedAt, @UpdatedAt);
+                INSERT INTO TodoItems (Title, IsCompleted, Content, UserId) 
+                VALUES (@Title, @IsCompleted, @Content, @UserId);
                 SELECT CAST(SCOPE_IDENTITY() as bigint)";
                 
             var id = await connection.QuerySingleAsync<long>(sql, todoItem);
             todoItem.Id = id;
         }
 
-        public async Task UpdateTodo(TodoItem todoItem)
+        public async Task UpdateTodo(TodoItem todoItem, int userId)
         {
             todoItem.UpdatedAt = DateTime.UtcNow;
-            
+
             using var connection = _dbContext.CreateConnection();
             string sql = @"
                 UPDATE TodoItems 
@@ -76,30 +76,41 @@ namespace backend.Repositories
                     Content = @Content, 
                     CompleteAt = @CompleteAt, 
                     UpdatedAt = @UpdatedAt 
-                WHERE Id = @Id";
-                
-            await connection.ExecuteAsync(sql, todoItem);
+                WHERE Id = @Id AND UserId = @UserId";
+
+            await connection.ExecuteAsync(sql, new
+            {
+                todoItem.Id,
+                todoItem.Title,
+                todoItem.IsCompleted,
+                todoItem.Content,
+                todoItem.CompleteAt,
+                todoItem.UpdatedAt,
+                UserId = userId
+            });
         }
 
-        public async Task RemoveTodo(long id)
+        public async Task RemoveTodo(long id, int userId)
         {
             using var connection = _dbContext.CreateConnection();
-            string sql = "DELETE FROM TodoItems WHERE Id = @Id";
-            await connection.ExecuteAsync(sql, new { Id = id });
+            string sql = "DELETE FROM TodoItems WHERE Id = @Id AND UserId = @UserId";
+            await connection.ExecuteAsync(sql, new { Id = id, UserId = userId});
         }
 
-        public async Task<IEnumerable<TodoItem>> GetTaskCompleteDays(long period)
+        public async Task<IEnumerable<TodoItem>> GetTaskCompleteDays(long period, int userId)
         {
             using var connection = _dbContext.CreateConnection();
             string sql = @"
                 SELECT Id, Title, IsCompleted, Content, CompleteAt, CreatedAt, UpdatedAt 
                 FROM TodoItems
-                WHERE CompleteAt IS NOT NULL 
+                WHERE UserId = @UserId 
+                AND CompleteAt IS NOT NULL 
                 AND CompleteAt >= @StartDate 
                 AND CompleteAt <= @EndDate";
 
             return await connection.QueryAsync<TodoItem>(sql, new 
             { 
+                UserId = userId,
                 StartDate = DateTime.UtcNow.AddDays(-period), 
                 EndDate = DateTime.UtcNow 
             });

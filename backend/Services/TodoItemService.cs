@@ -16,8 +16,8 @@ namespace backend.Services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync(string method = "", string field = "", string order = "") {
-            var todoItems = await _repo.GetTodoItems(method, field, order);
+        public async Task<IEnumerable<TodoResponseDto>> GetAllTodoItemsAsync(int userId, string method = "", string field = "", string order = "") {
+            var todoItems = await _repo.GetTodoItems(userId,method, field, order);
             return todoItems.Select(p => new TodoResponseDto{
                 Id = p.Id,
                 Title = p.Title,
@@ -29,8 +29,8 @@ namespace backend.Services
             });
         }
 
-        public async Task<TodoResponseDto> GetOneTodoItemAsync(long id){
-            var todoItem = await _repo.GetTodo(id);
+        public async Task<TodoResponseDto> GetOneTodoItemAsync(long id, int userId){
+            var todoItem = await _repo.GetTodo(id, userId);
 
             if (todoItem == null) {
                 throw new KeyNotFoundException("Task is not found.");
@@ -48,11 +48,12 @@ namespace backend.Services
             };
         }
 
-        public async Task<TodoResponseDto> CreateTodo(TodoRequestDto todoRequestDto){
+        public async Task<TodoResponseDto> CreateTodo(TodoRequestDto todoRequestDto, int userId){
             var newTodo = new TodoItem{
                 Title = todoRequestDto.Title,
                 IsCompleted = todoRequestDto.IsCompleted,
-                Content = todoRequestDto.Content
+                Content = todoRequestDto.Content,
+                UserId = userId
             };
 
             await _repo.CreateTodo(newTodo);
@@ -61,12 +62,12 @@ namespace backend.Services
                 Id = newTodo.Id,
                 Title = newTodo.Title,
                 IsCompleted = newTodo.IsCompleted,
-                Content = newTodo.Content
+                Content = newTodo.Content,
             };
         }
 
-        public async Task UpdateTodo(long id, TodoRequestDto todoRequestDto){
-            var todoItem = await _repo.GetTodo(id);
+        public async Task UpdateTodo(long id, TodoRequestDto todoRequestDto, int userId){
+            var todoItem = await _repo.GetTodo(id, userId);
             var cambodiaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
             if (todoItem == null) {
@@ -85,21 +86,21 @@ namespace backend.Services
                 todoItem.CompleteAt = null;
             }
 
-            await _repo.UpdateTodo(todoItem);
+            await _repo.UpdateTodo(todoItem, userId);
         }
 
-        public async Task RemoveTodo(long id){
-            var todoItem = await _repo.GetTodo(id);
+        public async Task RemoveTodo(long id, int userId){
+            var todoItem = await _repo.GetTodo(id, userId);
 
             if (todoItem == null){
                 throw new KeyNotFoundException("Task is not found");
             }
 
-            await _repo.RemoveTodo(id);
+            await _repo.RemoveTodo(id, userId);
         }
 
-        public async Task<IEnumerable<TodoResponseDto>> GetAllTaskDaysAsync(long period){
-            var todoItem7Days =  await _repo.GetTaskCompleteDays(period);
+        public async Task<IEnumerable<TodoResponseDto>> GetAllTaskDaysAsync(long period, int userId){
+            var todoItem7Days =  await _repo.GetTaskCompleteDays(period, userId);
 
             return todoItem7Days.Select(p => new TodoResponseDto{
                 Id = p.Id,
@@ -108,7 +109,8 @@ namespace backend.Services
                 Content = p.Content,
                 CompleteAt = p.CompleteAt,
                 CreatedAt = p.CreatedAt,
-                UpdatedAt = p.CreatedAt
+                UpdatedAt = p.CreatedAt,
+
             });
         }
     }
