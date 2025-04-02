@@ -7,7 +7,8 @@ class AuthService {
   async register(registerRequest: RegisterRequest): Promise<AuthRequest> {
     const response = await axios.post<AuthRequest>(
       `${API_URL}/auth/register`,
-      registerRequest
+      registerRequest,
+      { withCredentials: true }
     );
 
     if (response.data.token) {
@@ -18,7 +19,9 @@ class AuthService {
   }
 
   async login(loginRequest: LoginRequest): Promise<AuthRequest> {
-    const response = await axios.post(`${API_URL}/auth/login`, loginRequest);
+    const response = await axios.post(`${API_URL}/auth/login`, loginRequest, {
+      withCredentials: true,
+    });
 
     if (response.data.token) {
       localStorage.setItem("user", JSON.stringify(response.data));
@@ -56,10 +59,9 @@ class AuthService {
     return user !== null;
   }
 
-  // Make sure the current user object contains the userId
   getUserId(): string | null {
     const user = this.getCurrentUser();
-    return user ? user.userId : null; // Get userId from localStorage
+    return user ? user.userId : null;
   }
 }
 

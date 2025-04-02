@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-[600px] w-full">
-    <!-- Open Sidebar Button -->
     <button
       @click="isOpen"
       class="bg-stone-100 border w-full h-14 rounded text-3xl font-bold"
@@ -8,14 +7,12 @@
       +
     </button>
 
-    <!-- Overlay Background -->
     <div
       v-if="open"
       class="fixed inset-0 bg-black opacity-80 z-50"
       @click="isOpen"
     ></div>
 
-    <!-- Sidebar Form -->
     <section
       :class="{
         'right-0': open,
@@ -26,7 +23,7 @@
       <h1 class="text-xl font-bold mb-4">Daily Plan</h1>
 
       <form @submit.prevent="addTodo" class="flex flex-col gap-4">
-        <!-- Title Input -->
+
         <div class="border px-2 py-2 rounded border-stone-400">
           <label class="block font-bold">Title:</label>
           <input
@@ -37,7 +34,6 @@
           />
         </div>
 
-        <!-- Content Input -->
         <div class="border px-2 py-2 rounded border-stone-400">
           <label class="block font-bold">Content:</label>
           <textarea
@@ -48,7 +44,6 @@
           ></textarea>
         </div>
 
-        <!-- Submit Button -->
         <button
           type="submit"
           class="bg-pink-600 text-white font-bold py-2 rounded hover:bg-pink-700"
@@ -82,12 +77,10 @@ export default {
         isComplete: false,
       });
 
-      // Reset fields and close sidebar
       title.value = "";
       content.value = "";
       open.value = false;
 
-      // Emit refresh event
       this.$emit("refresh");
     };
 
